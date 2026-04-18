@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import stores, products, price_logs
+from app.api import stores, products, price_logs, scrape
 from app.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
@@ -13,6 +13,7 @@ app = FastAPI(
 app.include_router(stores.router, prefix="/api/stores", tags=["stores"])
 app.include_router(products.router, prefix="/api/products", tags=["products"])
 app.include_router(price_logs.router, prefix="/api/price-logs", tags=["price-logs"])
+app.include_router(scrape.router, prefix="/api/scrape", tags=["scrape"])
 
 
 @app.get("/")

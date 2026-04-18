@@ -1,4 +1,5 @@
 import json
+import re
 from openai import AsyncOpenAI
 from app.config import settings
 
@@ -14,9 +15,16 @@ Respond ONLY with valid JSON: {"name": "...", "price": 0.0, "in_stock": true}
 If you cannot find a value, use null."""
 
 
+def _html_to_text(html: str) -> str:
+    text = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL)
+    text = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.DOTALL)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:6000]
+
+
 async def extract_with_llm(html: str) -> dict | None:
-    # Trim HTML to avoid excessive token usage — send the first 8000 chars
-    snippet = html[:8000]
+    snippet = _html_to_text(html)
 
     response = await client.chat.completions.create(
         model="gpt-4o-mini",

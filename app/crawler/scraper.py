@@ -17,6 +17,7 @@ async def fetch_page(url: str) -> str:
         )
         page = await context.new_page()
         await page.goto(url, wait_until="networkidle", timeout=30000)
+        await page.wait_for_timeout(2000)
         content = await page.content()
         await browser.close()
     return content
